@@ -18,7 +18,7 @@ class Ground:
 
 class Bird:
     def __init__(self):
-        self.image = pygame.image.load("assets\\Game Objects\\yellowbird-midflap.png").convert()
+        self.image = pygame.image.load("assets\\Game Objects\\yellowbird\\yellowbird-midflap.png").convert()
         self.image = pygame.transform.scale(self.image,(34,24))
 
     def draw(self, screen):
