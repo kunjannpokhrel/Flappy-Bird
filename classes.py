@@ -8,9 +8,6 @@ class Background:
     def draw(self, screen):
         screen.blit(self.image, (0, 0))
 
-
-
-
 class Ground:
     def __init__(self):
         self.image = pygame.image.load("assets\\Game Objects\\base.png").convert()
@@ -26,3 +23,11 @@ class Bird:
 
     def draw(self, screen):
         screen.blit(self.image, (380, 280))
+
+class Click:
+    def __init__(self):
+        self.music = pygame.mixer.Sound("assets\\Sound Efects\\click.mp3")
+        self.music.set_volume(1)
+
+    def play(self):
+        self.music.play()

@@ -5,11 +5,12 @@ pygame.mixer.init()
 screen=pygame.display.set_mode((800,600) ,pygame.FULLSCREEN| pygame.SCALED)
 pygame.display.set_caption("FLAPPY BIRD")
 
-from classes import Background, Ground, Bird
+from classes import Background, Ground, Bird,Click
 clock=pygame.time.Clock()
 
 ground=Ground()
 bird=Bird()
+click=Click()
 
 background_list=[]
 for i in range(6):
@@ -66,17 +67,20 @@ background_rects = [pygame.Rect(130, 180, 150, 120),pygame.Rect(325, 180, 150, 1
 selected_background = 1
 
 def headline_menu():
-    title =TITLE_FONT.render("FLAPPY BIRD", True, WHITE)
+
+    title = TITLE_FONT.render("FLAPPY BIRD", True, WHITE)
+    screen.blit(TITLE_FONT.render("FLAPPY BIRD", True, BLACK), title.get_rect(center=(402, 102)))
     screen.blit(title, title.get_rect(center=(400, 100)))
 
-    subtitle =SMALL_FONT.render("MAIN MENU", True, "Black")
+    subtitle =SMALL_FONT.render("MAIN MENU", True, WHITE)
     screen.blit(subtitle, subtitle.get_rect(center=(400, 150)))
 
 def headline_text(topic):
         title = TITLE_FONT.render(f"{topic}S", True, WHITE)
+        screen.blit(TITLE_FONT.render(f"{topic}S", True, BLACK), title.get_rect(center=(402, 82)))
         screen.blit(title, title.get_rect(center=(400, 80)))
 
-        subtitle = SMALL_FONT.render(f"CHOOSE YOUR {topic}", True, "CYAN")
+        subtitle = SMALL_FONT.render(f"CHOOSE YOUR {topic}", True, DARK)
         screen.blit(subtitle, subtitle.get_rect(center=(400, 125)))
 
 def backbutton():
@@ -123,10 +127,41 @@ while running:
         elif keys[pygame.K_F11] or keys[pygame.K_f]:
             pygame.display.toggle_fullscreen() 
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-         if event.button == 1:
-          if back_button.collidepoint(event.pos):
-            state = MENU
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+
+            if state !=MENU and back_button.collidepoint(event.pos):
+                state = MENU
+                click.play()
+
+            elif state == MENU:
+                if play_button.collidepoint(event.pos):
+                    state = PLAYING
+                    click.play()
+                elif characters_button.collidepoint(event.pos):
+                    state = CHARACTERS
+                    click.play()
+                elif backgrounds_button.collidepoint(event.pos):
+                    state = BACKGROUNDS
+                    click.play()
+                elif ABOUT_button.collidepoint(event.pos):
+                    state = ABOUT
+                    click.play()
+                elif quit_button.collidepoint(event.pos):
+                    running = False
+                    click.play()
+
+            elif state == CHARACTERS:
+                for i in range(6):
+                    if character_rects[i].collidepoint(event.pos):
+                        selected_character = i + 1
+                        click.play()
+
+            elif state == BACKGROUNDS:
+                for i in range(6):
+                    if background_rects[i].collidepoint(event.pos):
+                        selected_background = i + 1
+                        click.play()
+
 
     if state==PLAYING:
         bird.draw(screen)
@@ -147,12 +182,6 @@ while running:
                 border_color=DARK
             pygame.draw.rect(screen, border_color, character_rects[i], 3)
 
-        for i in range(6):
-         if event.type == pygame.MOUSEBUTTONDOWN:
-          if event.button==1:
-           if character_rects[i].collidepoint(event.pos):
-             selected_character = i + 1             
-
     if state==BACKGROUNDS:
         headline_text(topic="BACKGROUND")
         backbutton()
@@ -164,12 +193,6 @@ while running:
             else:
                 border_color=DARK
             pygame.draw.rect(screen, border_color, background_rects[i], 3)
-
-        for i in range(6):
-         if event.type == pygame.MOUSEBUTTONDOWN:
-          if event.button==1:
-           if background_rects[i].collidepoint(event.pos):
-             selected_background = i + 1 
 
 
     if state==ABOUT:
@@ -188,19 +211,6 @@ while running:
         # Background
         headline_menu()
         menubuttons()
-
-        if event.type == pygame.MOUSEBUTTONDOWN:
-         if event.button == 1:
-            if play_button.collidepoint(event.pos):
-                state=PLAYING
-            elif characters_button.collidepoint(event.pos):
-                state=CHARACTERS
-            elif backgrounds_button.collidepoint(event.pos):
-                state=BACKGROUNDS
-            elif ABOUT_button.collidepoint(event.pos):
-                state=ABOUT
-            elif quit_button.collidepoint(event.pos):
-                running=False
 
 
     pygame.display.flip()
