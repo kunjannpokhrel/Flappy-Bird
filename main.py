@@ -8,9 +8,13 @@ pygame.display.set_caption("FLAPPY BIRD")
 from classes import Background, Ground, Bird
 clock=pygame.time.Clock()
 
-background=Background()
 ground=Ground()
 bird=Bird()
+
+background_list=[]
+for i in range(6):
+   background_list.append(Background(i))
+
 
 # Colors
 WHITE =(255, 255, 255)
@@ -27,7 +31,7 @@ RED=(255,0,0)
 MENU = "menu"
 CHARACTERS ="characters"
 BACKGROUNDS = "backgrounds"
-SETTINGS ="settings"
+ABOUT ="ABOUT"
 PLAYING = "playing"
 state=MENU
 
@@ -41,7 +45,7 @@ selected_character=1
 character_images = []
 for i in range(6):
     img = pygame.image.load("assets\\Game Objects\\yellowbird\\yellowbird-midflap.png").convert()
-    img = pygame.transform.scale(img, (150, 120))
+    img = pygame.transform.scale(img, (110, 80))
     character_images.append(img)
 
 character_rects = [pygame.Rect(130, 180, 150, 120),pygame.Rect(325, 180, 150, 120),
@@ -51,7 +55,7 @@ character_rects = [pygame.Rect(130, 180, 150, 120),pygame.Rect(325, 180, 150, 12
 # background loads
 background_images = []
 for i in range(6):
-    img = pygame.image.load("assets\\Game Objects\\background-day.png").convert()
+    img = pygame.image.load(f"assets\\Background\\background{i}.png").convert()
     img = pygame.transform.scale(img, (150, 120))
     background_images.append(img)
 
@@ -59,8 +63,7 @@ background_rects = [pygame.Rect(130, 180, 150, 120),pygame.Rect(325, 180, 150, 1
                    pygame.Rect(520, 180, 150, 120),pygame.Rect(130, 350, 150, 120),
                    pygame.Rect(325, 350, 150, 120),pygame.Rect(520, 350, 150, 120)]
 
-selected_background = 0 
-selected_background = 0 
+selected_background = 1
 
 def headline_menu():
     title =TITLE_FONT.render("FLAPPY BIRD", True, WHITE)
@@ -86,26 +89,31 @@ def menubuttons():
     pygame.draw.rect(screen, BLUE, play_button, border_radius=12)
     pygame.draw.rect(screen, BLUE, characters_button, border_radius=12)
     pygame.draw.rect(screen, BLUE, backgrounds_button, border_radius=12)
-    pygame.draw.rect(screen, BLUE, settings_button, border_radius=12)
+    pygame.draw.rect(screen, BLUE, ABOUT_button, border_radius=12)
     pygame.draw.rect(screen, BLUE, quit_button, border_radius=12)
 
     # Button text
     play_text =FONT.render("PLAY", True, WHITE)
     characters_text =FONT.render("CHARACTERS", True, WHITE)
     backgrounds_text =FONT.render("BACKGROUNDS", True, WHITE)
-    settings_text = FONT.render("SETTINGS", True, WHITE)
+    ABOUT_text = FONT.render("ABOUT", True, WHITE)
     quit_text =FONT.render("QUIT", True, WHITE)
 
     screen.blit(play_text, play_text.get_rect(center=play_button.center))
     screen.blit(characters_text, characters_text.get_rect(center=characters_button.center))
     screen.blit(backgrounds_text, backgrounds_text.get_rect(center=backgrounds_button.center))
-    screen.blit(settings_text, settings_text.get_rect(center=settings_button.center))
+    screen.blit(ABOUT_text, ABOUT_text.get_rect(center=ABOUT_button.center))
     screen.blit(quit_text, quit_text.get_rect(center=quit_button.center)) 
 
-
+def draw_background():
+ bg_index= selected_background - 1
+ background_list[bg_index].draw(screen)
     
 running=True
 while running:
+    draw_background()
+    ground.draw(screen)
+
 
     keys=pygame.key.get_pressed()
     for event in pygame.event.get():
@@ -121,33 +129,31 @@ while running:
             state = MENU
 
     if state==PLAYING:
-        background.draw(screen)
-        ground.draw(screen)
         bird.draw(screen)
         backbutton()
 
 
 
     if state==CHARACTERS:
-
-        # Background
-        background.draw(screen)
-        ground.draw(screen)
         headline_text(topic="CHARACTER")
         backbutton()
 
         for i in range(0,6):
-            screen.blit(character_images[i], character_rects[i])
+            img_rect = character_images[i].get_rect(center=character_rects[i].center)
+            screen.blit(character_images[i], img_rect)
             if selected_character == i+1:
                 border_color = RED 
             else:
                 border_color=DARK
             pygame.draw.rect(screen, border_color, character_rects[i], 3)
-            
+
+        for i in range(6):
+         if event.type == pygame.MOUSEBUTTONDOWN:
+          if event.button==1:
+           if character_rects[i].collidepoint(event.pos):
+             selected_character = i + 1             
 
     if state==BACKGROUNDS:
-        background.draw(screen)
-        ground.draw(screen)
         headline_text(topic="BACKGROUND")
         backbutton()
 
@@ -157,26 +163,29 @@ while running:
                 border_color = RED 
             else:
                 border_color=DARK
-            pygame.draw.rect(screen, border_color, character_rects[i], 3)
+            pygame.draw.rect(screen, border_color, background_rects[i], 3)
+
+        for i in range(6):
+         if event.type == pygame.MOUSEBUTTONDOWN:
+          if event.button==1:
+           if background_rects[i].collidepoint(event.pos):
+             selected_background = i + 1 
 
 
-    if state==SETTINGS:
+    if state==ABOUT:
         backbutton()
 
 
     if state==MENU:
-        backbutton() 
 
         # Main menu buttons
         play_button =pygame.Rect(275, 200, 250, 50)
         characters_button =pygame.Rect(275, 265, 250, 50)
         backgrounds_button =pygame.Rect(275, 330, 250, 50)
-        settings_button =pygame.Rect(275, 395, 250, 50)
+        ABOUT_button =pygame.Rect(275, 395, 250, 50)
         quit_button =pygame.Rect(275, 460, 250, 50)
 
         # Background
-        background.draw(screen)
-        ground.draw(screen)
         headline_menu()
         menubuttons()
 
@@ -188,8 +197,8 @@ while running:
                 state=CHARACTERS
             elif backgrounds_button.collidepoint(event.pos):
                 state=BACKGROUNDS
-            elif settings_button.collidepoint(event.pos):
-                state=SETTINGS
+            elif ABOUT_button.collidepoint(event.pos):
+                state=ABOUT
             elif quit_button.collidepoint(event.pos):
                 running=False
 

@@ -1,12 +1,15 @@
 import pygame
 
 class Background:
-    def __init__(self):
-        self.image = pygame.image.load("assets\\Game Objects\\background-day.png").convert()
-        self.image = pygame.transform.scale(self.image,(800,600))
+    def __init__(self,bg_no):
+            self.image = pygame.image.load(f"assets\\Background\\background{bg_no}.png").convert()
+            self.image = pygame.transform.scale(self.image,(800,600))
 
     def draw(self, screen):
         screen.blit(self.image, (0, 0))
+
+
+
 
 class Ground:
     def __init__(self):
