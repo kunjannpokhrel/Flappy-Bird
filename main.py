@@ -42,6 +42,7 @@ SMALL_FONT= pygame.font.SysFont("arial",16)
 
 back_button = pygame.Rect(30, 30, 100, 40)
 selected_character=1
+
 # character loads
 character_images = []
 for i in range(6):
@@ -65,6 +66,13 @@ background_rects = [pygame.Rect(130, 180, 150, 120),pygame.Rect(325, 180, 150, 1
                    pygame.Rect(325, 350, 150, 120),pygame.Rect(520, 350, 150, 120)]
 
 selected_background = 1
+
+# Main menu buttons
+play_button =pygame.Rect(275,200,250, 50)
+characters_button =pygame.Rect(275, 265,250, 50)
+backgrounds_button =pygame.Rect(275,330, 250, 50)
+ABOUT_button =pygame.Rect(275, 395,250, 50)
+quit_button =pygame.Rect(275,460,250, 50)
 
 def headline_menu():
 
@@ -123,11 +131,16 @@ while running:
     for event in pygame.event.get():
         if event.type==pygame.QUIT or keys[pygame.K_ESCAPE]:
             running=False
+ 
+        elif event.type == pygame.KEYDOWN:
+            if state == PLAYING:
+                if event.key == pygame.K_SPACE or event.key == pygame.K_UP:
+                    bird.space()
 
-        elif keys[pygame.K_F11] or keys[pygame.K_f]:
-            pygame.display.toggle_fullscreen() 
+            elif keys[pygame.K_F11] or keys[pygame.K_f]:
+                pygame.display.toggle_fullscreen() 
 
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 
             if state !=MENU and back_button.collidepoint(event.pos):
                 state = MENU
@@ -163,11 +176,15 @@ while running:
                         click.play()
 
 
+
     if state==PLAYING:
         bird.draw(screen)
         backbutton()
+        bird.update()
 
-
+        bg_index = selected_background - 1
+        background_list[bg_index].update() 
+        ground.update()
 
     if state==CHARACTERS:
         headline_text(topic="CHARACTER")
@@ -200,13 +217,6 @@ while running:
 
 
     if state==MENU:
-
-        # Main menu buttons
-        play_button =pygame.Rect(275, 200, 250, 50)
-        characters_button =pygame.Rect(275, 265, 250, 50)
-        backgrounds_button =pygame.Rect(275, 330, 250, 50)
-        ABOUT_button =pygame.Rect(275, 395, 250, 50)
-        quit_button =pygame.Rect(275, 460, 250, 50)
 
         # Background
         headline_menu()
