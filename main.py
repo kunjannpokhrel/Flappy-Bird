@@ -5,12 +5,13 @@ pygame.mixer.init()
 screen=pygame.display.set_mode((800,600) ,pygame.FULLSCREEN| pygame.SCALED)
 pygame.display.set_caption("FLAPPY BIRD")
 
-from classes import Background, Ground, Bird,Click
+from classes import Background, Ground, Bird,Click,Pipe
 clock=pygame.time.Clock()
 
 ground=Ground()
 bird=Bird()
 click=Click()
+pipe=Pipe()
 
 background_list=[]
 for i in range(6):
@@ -124,6 +125,7 @@ def draw_background():
 running=True
 while running:
     draw_background()
+    pipe.draw(screen)
     ground.draw(screen)
 
 
@@ -175,12 +177,13 @@ while running:
                         selected_background = i + 1
                         click.play()
 
-
+ 
 
     if state==PLAYING:
         bird.draw(screen)
         backbutton()
         bird.update()
+        pipe.update()
 
         bg_index = selected_background - 1
         background_list[bg_index].update() 
