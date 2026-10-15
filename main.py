@@ -5,13 +5,14 @@ pygame.mixer.init()
 screen=pygame.display.set_mode((800,600) ,pygame.FULLSCREEN| pygame.SCALED)
 pygame.display.set_caption("FLAPPY BIRD")
 
-from classes import Background, Ground, Bird,Click,Pipe
+from classes import Background, Ground, Bird,Click,Pipe,Wing
 clock=pygame.time.Clock()
 
 ground=Ground()
 bird=Bird()
 click=Click()
 pipe=Pipe()
+wing=Wing()
 
 background_list=[]
 for i in range(6):
@@ -138,6 +139,7 @@ while running:
             if state == PLAYING:
                 if event.key == pygame.K_SPACE or event.key == pygame.K_UP:
                     bird.space()
+                    wing.play()
 
             elif keys[pygame.K_F11] or keys[pygame.K_f]:
                 pygame.display.toggle_fullscreen() 

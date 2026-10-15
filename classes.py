@@ -93,6 +93,14 @@ class Click:
     def play(self):
         self.music.play()
 
+class Wing:
+    def __init__(self):
+        self.music = pygame.mixer.Sound("assets\\Sound Efects\\wing.ogg")
+        self.music.set_volume(1)
+
+    def play(self):
+        self.music.play()
+
 class Pipe:
     def __init__(self):
         self.image = pygame.image.load("assets\\Game Objects\\pipe-green.png").convert()
