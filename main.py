@@ -6,7 +6,7 @@ pygame.mixer.init()
 screen=pygame.display.set_mode((800,600) ,pygame.FULLSCREEN| pygame.SCALED)
 pygame.display.set_caption("FLAPPY BIRD")
 
-from classes import Background, Ground, Bird,Click,Pipe,Wing
+from classes import Background, Ground, Bird,Click,Pipe,Wing,Death,Point
 clock=pygame.time.Clock()
 
 ground=Ground()
@@ -14,6 +14,8 @@ bird=Bird()
 click=Click()
 pipe=Pipe()
 wing=Wing()
+death=Death()
+point=Point()
 
 background_list=[]
 for i in range(6):
@@ -243,11 +245,13 @@ while running:
         for pipe_rect in all_pipes:
             if bird_rect.colliderect(pipe_rect):
                 state=GAMEOVER
+                death.play()
         if bird.y <= 0 or bird.y >= 525:
             state=GAMEOVER
+            death.play()
         if pipe.x== 328 or pipe.pipe2_x == 328 or pipe.pipe3_x == 328 or pipe.pipe4_x == 328:
             score += 1
-
+            point.play()
         score_str = str(score)
         start_x = 400-(len(score_str) * 26 // 2)
         for char in score_str:

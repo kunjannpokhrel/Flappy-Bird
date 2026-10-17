@@ -96,6 +96,22 @@ class Click:
     def play(self):
         self.music.play()
 
+class Death:
+    def __init__(self):
+        self.music = pygame.mixer.Sound("assets\\Sound Efects\\hit.ogg")
+        self.music.set_volume(1)
+
+    def play(self):
+        self.music.play()
+
+class Point:
+    def __init__(self):
+        self.music = pygame.mixer.Sound("assets\\Sound Efects\\point.ogg")
+        self.music.set_volume(1)
+
+    def play(self):
+        self.music.play()
+
 class Wing:
     def __init__(self):
         self.music = pygame.mixer.Sound("assets\\Sound Efects\\wing.ogg")
