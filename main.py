@@ -74,6 +74,11 @@ background_rects = [pygame.Rect(130, 180, 150, 120),pygame.Rect(325, 180, 150, 1
                    pygame.Rect(325, 350, 150, 120),pygame.Rect(520, 350, 150, 120)]
 
 selected_background = 1
+num_imgs = []
+for i in range(10):
+    img= pygame.image.load(f"assets\\UI\\NUmbers\\{i}.png").convert_alpha()
+    scaled_img= pygame.transform.scale(img, (24, 36))
+    num_imgs.append(scaled_img)
 
 # Main menu buttons
 play_button =pygame.Rect(275,200,250, 50)
@@ -243,8 +248,12 @@ while running:
         if pipe.x== 328 or pipe.pipe2_x == 328 or pipe.pipe3_x == 328 or pipe.pipe4_x == 328:
             score += 1
 
-        score_text= FONT.render(f"Score:{score}",True, (255, 255, 255))
-        screen.blit(score_text, (20, 20))
+        score_str = str(score)
+        start_x = 400-(len(score_str) * 26 // 2)
+        for char in score_str:
+            screen.blit(num_imgs[int(char)], (start_x, 30))
+            start_x += 26
+        
         bg_index = selected_background - 1
         background_list[bg_index].update() 
         ground.update()
