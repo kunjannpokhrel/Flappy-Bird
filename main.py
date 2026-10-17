@@ -1,4 +1,5 @@
 import pygame
+import webbrowser
 pygame.init()
 pygame.mixer.init()
 
@@ -36,13 +37,18 @@ CHARACTERS ="characters"
 BACKGROUNDS = "backgrounds"
 ABOUT ="ABOUT"
 PLAYING = "playing"
+READY="ready"
+GAMEOVER="GAMEOVER"
 state=MENU
+score = 0
 
 TITLE_FONT=pygame.font.SysFont("arial", 44, bold=True)
 FONT=pygame.font.SysFont("arial", 23, bold=True)
 SMALL_FONT= pygame.font.SysFont("arial",16)
 
 back_button = pygame.Rect(30, 30, 100, 40)
+start_game_button=pygame.Rect(275, 350, 250, 50) 
+menu_button=pygame.Rect(275, 380, 250, 50)     
 selected_character=1
 
 # character loads
@@ -75,6 +81,9 @@ characters_button =pygame.Rect(275, 265,250, 50)
 backgrounds_button =pygame.Rect(275,330, 250, 50)
 ABOUT_button =pygame.Rect(275, 395,250, 50)
 quit_button =pygame.Rect(275,460,250, 50)
+
+github_button = pygame.Rect(200, 420, 400, 40)
+linkedin_button = pygame.Rect(200, 480, 400, 40)
 
 def headline_menu():
 
@@ -122,12 +131,23 @@ def menubuttons():
 def draw_background():
  bg_index= selected_background - 1
  background_list[bg_index].draw(screen)
-    
+
+def reset():
+    global bird ,pipe, ground ,score ,state
+    bird= Bird()      
+    pipe= Pipe()     
+    ground= Ground()  
+    score=0          
+    state= MENU   
+
 running=True
 while running:
     draw_background()
-    pipe.draw(screen)
-    ground.draw(screen)
+
+    if state in [READY,PLAYING,GAMEOVER]:
+        pipe.draw(screen)
+        ground.draw(screen)
+        bird.draw(screen)
 
 
     keys=pygame.key.get_pressed()
@@ -140,19 +160,23 @@ while running:
                 if event.key == pygame.K_SPACE or event.key == pygame.K_UP:
                     bird.space()
                     wing.play()
+            elif state == READY:
+                if event.key == pygame.K_SPACE or event.key == pygame.K_UP:
+                    state = PLAYING
+                    bird.space()
+                    wing.play()
 
             elif keys[pygame.K_F11] or keys[pygame.K_f]:
                 pygame.display.toggle_fullscreen() 
 
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-
-            if state !=MENU and back_button.collidepoint(event.pos):
+            if state not in [MENU,READY,GAMEOVER] and back_button.collidepoint(event.pos):
                 state = MENU
                 click.play()
 
             elif state == MENU:
                 if play_button.collidepoint(event.pos):
-                    state = PLAYING
+                    state = READY 
                     click.play()
                 elif characters_button.collidepoint(event.pos):
                     state = CHARACTERS
@@ -167,6 +191,15 @@ while running:
                     running = False
                     click.play()
 
+            elif state== READY:
+                if start_game_button.collidepoint(event.pos):
+                    state= PLAYING
+                    bird.space()
+                    wing.play()
+            elif state == GAMEOVER:
+                if menu_button.collidepoint(event.pos):
+                    reset()
+                    click.play()
             elif state == CHARACTERS:
                 for i in range(6):
                     if character_rects[i].collidepoint(event.pos):
@@ -179,14 +212,39 @@ while running:
                         selected_background = i + 1
                         click.play()
 
+            elif state == ABOUT:
+                if github_button.collidepoint(event.pos):
+                    webbrowser.open("https://github.com/kunjannpokhrel")
+                    click.play()
+                elif linkedin_button.collidepoint(event.pos):
+                    webbrowser.open("https://linkedin.com")
+                    click.play()
+
+    if state == READY:
+        pygame.draw.rect(screen, GREEN,start_game_button, border_radius=12)
+        start_text = FONT.render("START GAME", True, WHITE)
+        screen.blit(start_text,start_text.get_rect(center=start_game_button.center))
+        
+        info_text =TITLE_FONT.render("PRESS SPACE TO FLAP & START", True, WHITE)
+        screen.blit(info_text,info_text.get_rect(center=(400, 200)))
  
 
     if state==PLAYING:
-        bird.draw(screen)
         backbutton()
         bird.update()
         pipe.update()
+        bird_rect= bird.get_rect()
+        all_pipes= pipe.get_rects()
+        for pipe_rect in all_pipes:
+            if bird_rect.colliderect(pipe_rect):
+                state=GAMEOVER
+        if bird.y <= 0 or bird.y >= 525:
+            state=GAMEOVER
+        if pipe.x== 328 or pipe.pipe2_x == 328 or pipe.pipe3_x == 328 or pipe.pipe4_x == 328:
+            score += 1
 
+        score_text= FONT.render(f"Score:{score}",True, (255, 255, 255))
+        screen.blit(score_text, (20, 20))
         bg_index = selected_background - 1
         background_list[bg_index].update() 
         ground.update()
@@ -216,13 +274,65 @@ while running:
                 border_color=DARK
             pygame.draw.rect(screen, border_color, background_rects[i], 3)
 
+    if state == GAMEOVER:
+        go_panel = pygame.Rect(200, 120, 400, 360)
+        pygame.draw.rect(screen, DARK,go_panel, border_radius=15)
+        
+        go_text = TITLE_FONT.render("GAME OVER", True, RED)
+        screen.blit(go_text,go_text.get_rect(center=(400, 180)))
+        
+        final_score_text = FONT.render(f"Final Score: {score}", True, WHITE)
+        screen.blit(final_score_text,final_score_text.get_rect(center=(400, 250)))
+        
+        pygame.draw.rect(screen, BLUE, menu_button, border_radius=12)
+        menu_btn_text = FONT.render("MAIN MENU", True, WHITE)
+        screen.blit(menu_btn_text,menu_btn_text.get_rect(center=menu_button.center))
+
 
     if state==ABOUT:
         backbutton()
+    if state == ABOUT:
+        headline_text(topic="ABOUT")
+        backbutton()
 
+        # 1. ABOUT ME INFOCARD PANEL
+        panel_rect = pygame.Rect(100, 150, 600, 390)
+        pygame.draw.rect(screen, BLACK, panel_rect, border_radius=15)
+        pygame.draw.rect(screen, GREY, panel_rect, width=2, border_radius=15)
+
+        # Biography rendering details
+        bio_title = FONT.render("THE DEVELOPER", True, YELLOW)
+        screen.blit(bio_title, (130, 175))
+        
+        bio_p1 = SMALL_FONT.render("Hi lol! myself Kunjan Pokhrel. This is my ", True, WHITE)
+        bio_p2 = SMALL_FONT.render("project that i made as my second game hehe.", True, WHITE)
+        screen.blit(bio_p1, (130, 210))
+        screen.blit(bio_p2, (130, 230))
+
+        pygame.draw.line(screen, DARK, (130, 265), (670, 265), 2)
+
+        ctrl_title = FONT.render("GAME MECHANICS", True, YELLOW)
+        screen.blit(ctrl_title, (130, 285))
+        
+        ctrl_space= SMALL_FONT.render("• SPACEBAR / UP ARROW : Flap wings to fly upward", True, WHITE)
+        ctrl_ready= SMALL_FONT.render("• SPACEBAR (On Ready)  : Launch the active bird", True, WHITE)
+        ctrl_reset= SMALL_FONT.render("• SPACEBAR (On Death)  : Reset back to Main Menu", True, WHITE)
+        ctrl_screen= SMALL_FONT.render("• F11 / F KEY          : Toggle fullscreen window mode", True, WHITE)
+        
+        screen.blit(ctrl_space, (130, 320))
+        screen.blit(ctrl_ready, (130, 340))
+        screen.blit(ctrl_reset, (130, 360))
+        screen.blit(ctrl_screen, (130, 380))
+
+        pygame.draw.rect(screen, BLUE, github_button, border_radius=8)
+        gh_text = SMALL_FONT.render("View GitHub Profile", True, WHITE)
+        screen.blit(gh_text, gh_text.get_rect(center=github_button.center))
+
+        pygame.draw.rect(screen, BLUE, linkedin_button, border_radius=8)
+        li_text = SMALL_FONT.render("Connect on LinkedIn", True, WHITE)
+        screen.blit(li_text, li_text.get_rect(center=linkedin_button.center))
 
     if state==MENU:
-
         # Background
         headline_menu()
         menubuttons()

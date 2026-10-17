@@ -85,6 +85,9 @@ class Bird:
     def draw(self, screen,):
         screen.blit(self.image, (380, self.y))
 
+    def get_rect(self):
+     return pygame.Rect(380, self.y, 34, 24)
+
 class Click:
     def __init__(self):
         self.music = pygame.mixer.Sound("assets\\Sound Efects\\click.mp3")
@@ -176,5 +179,11 @@ class Pipe:
         screen.blit(self.image, (self.pipe4_x, self.pipe4_y))
         screen.blit(self.image2, (self.pipe4_x2, self.pipe4_y2))
 
+    def get_rects(self):
+        return [
+            pygame.Rect(self.x2, self.y2, 52, 320), pygame.Rect(self.x, self.y, 52, 320),
+            pygame.Rect(self.pipe2_x2, self.pipe2_y2, 52, 320), pygame.Rect(self.pipe2_x, self.pipe2_y, 52, 320),
+            pygame.Rect(self.pipe3_x2, self.pipe3_y2, 52, 320), pygame.Rect(self.pipe3_x, self.pipe3_y, 52, 320),
+            pygame.Rect(self.pipe4_x2, self.pipe4_y2, 52, 320), pygame.Rect(self.pipe4_x, self.pipe4_y, 52, 320)]
 
 
